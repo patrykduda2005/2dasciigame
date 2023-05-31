@@ -1,4 +1,5 @@
 use std::process::Command;
+use console::Term;
 
 use clearscreen;
 
@@ -45,20 +46,22 @@ impl Player {
     fn r#move(&mut self, board: &mut Board, position: Vec2) {
         board.setchar(self.position, '.');
         self.position = position;
-        board.setchar(self.position, '@');
+        board.setchar(self.position, self.skin);
     }
 }
 
 fn main() {
     let mut board = Board::new();
     let mut player = Player::new();
-    for x in 0..=10 {
-        for y in 0..=10 {
-            player.r#move(&mut board, Vec2{x:x, y:y});
-            clearscreen::clear().expect("Failed to clear a screen");
-            board.render();
-            let mut child = Command::new("sleep").arg("0.1").spawn().unwrap();
-            let _result = child.wait().unwrap();
+
+    //let mut child = Command::new("sleep").arg("0.1").spawn().unwrap();
+    //let _result = child.wait().unwrap();
+    let console = console::Term::stdout();
+    loop {
+        if console.read_key().unwrap() == console::Key::ArrowRight {
+            player.r#move(&mut board, Vec2{x:1, y:0})
         }
+        clearscreen::clear().expect("Failed to clear a screen");
+        board.render();
     }
 }
