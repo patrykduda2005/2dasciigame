@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 clearscreen = "2.0.1"
 console = "0.15.7"
+termion = "2.0.1"

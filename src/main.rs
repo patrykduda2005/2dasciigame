@@ -1,5 +1,9 @@
 use std::process::Command;
-use console::Term;
+use termion::event::Key;
+use termion::event::Key::*;
+use termion::input::TermRead;
+use core::ops::AddAssign;
+use core::ops::Add;
 
 use clearscreen;
 
@@ -20,9 +24,12 @@ impl Board {
             println!("");
         }
     }
-
-    fn setchar(&mut self, position: Vec2, char: char) {
+    fn setchar(&mut self, position: Vec2, char: char) -> Result<Vec2, &str> {
+        if position.x >= self.board[0].len() || position.y >= self.board.len() {
+            return Err("Board out of bounds");
+        }
         self.board[position.y][position.x] = char;
+        return Ok(position);
     }
 }
 
@@ -31,7 +38,23 @@ struct Vec2 {
     x: usize,
     y: usize,
 }
-
+impl Add for Vec2 {
+    type Output = Self;
+    fn add(self, other: Self) -> Self {
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        }
+    }
+}
+impl AddAssign for Vec2 {
+    fn add_assign(&mut self, other: Self) {
+        *self = Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        };
+    }
+}
 struct Player {
     skin: char,
     position: Vec2,
@@ -40,27 +63,35 @@ impl Player {
     fn new() -> Player {
         Player {
             skin: '@',
-            position: Vec2 {x: 3, y: 5},
+            position: Vec2 {x: 0, y: 0},
         }
     }
     fn r#move(&mut self, board: &mut Board, position: Vec2) {
-        board.setchar(self.position, '.');
-        self.position = position;
-        board.setchar(self.position, self.skin);
+        if let Err(e) = board.setchar(self.position + position, self.skin) {
+            println!("{e}");
+        } else {
+            board.setchar(self.position, '.').unwrap();
+            self.position += position;
+        }
     }
 }
 
 fn main() {
     let mut board = Board::new();
     let mut player = Player::new();
-
-    //let mut child = Command::new("sleep").arg("0.1").spawn().unwrap();
-    //let _result = child.wait().unwrap();
-    let console = console::Term::stdout();
+    let stdout = console::Term::buffered_stdout();
     loop {
-        if console.read_key().unwrap() == console::Key::ArrowRight {
-            player.r#move(&mut board, Vec2{x:1, y:0})
+        stdout.flush().unwrap();
+        if let Ok(chara) = stdout.read_char() {
+            match chara {
+                'd' => player.r#move(&mut board, Vec2{x:1,y:0}),
+                _ =>(),
+            }
         }
+
+
+        let mut child = Command::new("sleep").arg("0.1").spawn().unwrap();
+        let _result = child.wait().unwrap();
         clearscreen::clear().expect("Failed to clear a screen");
         board.render();
     }
