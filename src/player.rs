@@ -6,20 +6,28 @@ use crate::Board;
 pub struct Player {
     skin: char,
     position: Vec2,
+    layer: usize,
+    walls: Vec<char>,
 }
 impl Player {
     pub fn new() -> Player {
         Player {
             skin: '@',
             position: Vec2 {x: 0, y: 0},
+            layer: 1,
+            walls: vec!['#'],
         }
     }
 
     pub fn r#move(&mut self, board: &mut Board, position: Vec2) {
-        if let Err(e) = board.setchar(self.position + position, self.skin) {
+        if let Some(char) = board.getchar(0, self.position + position) {
+            self.walls.iter().for_each(|wall| if char == *wall {return;});
+        }
+
+        if let Err(e) = board.setchar(self.layer, self.position + position, self.skin) {
             println!("{e}");
         } else {
-            board.setchar(self.position, '.').unwrap();
+            board.setchar(self.layer, self.position, '.').unwrap();
             self.position += position;
         }
     }
