@@ -5,25 +5,19 @@ use crate::Board;
 
 pub struct Player {
     skin: char,
-    position: Vec2,
+    pub position: Vec2,
     layer: usize,
-    walls: Vec<char>,
 }
 impl Player {
-    pub fn new() -> Player {
+    pub fn new(spawn_location: (i32, i32)) -> Player {
         Player {
             skin: '@',
-            position: Vec2 {x: 0, y: 0},
+            position: Vec2 {x: spawn_location.1, y: spawn_location.0},
             layer: 1,
-            walls: vec!['#'],
         }
     }
 
     pub fn r#move(&mut self, board: &mut Board, position: Vec2) {
-        if let Some(char) = board.getchar(0, self.position + position) {
-            self.walls.iter().for_each(|wall| if char == *wall {return;});
-        }
-
         if let Err(e) = board.setchar(self.layer, self.position + position, self.skin) {
             println!("{e}");
         } else {
