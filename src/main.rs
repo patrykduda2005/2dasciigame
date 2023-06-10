@@ -1,4 +1,4 @@
-use std::fs::*;
+use std::{fs::*, thread, time};
 mod board;
 use board::Board;
 mod player;
@@ -41,7 +41,7 @@ fn main() {
     let term = console::Term::stdout();
     let fov = getfov(term.size());
     let mut board = Board::new(fov);
-    let mut player = Player::new((board.getboardsize(0.5)));
+    let mut player = Player::new(board.getboardsize(0.5));
     board.setchar(0, vec2::Vec2{x: 10, y: 5}, '#').unwrap();
     term.hide_cursor().unwrap();
     loop {

@@ -23,7 +23,7 @@ impl Board {
     
     pub fn getboardsize(&self, mut scale: f64) -> (i32,i32) {
         scale = 1.0 / scale;
-        (self.board[0].len() as i32 / 2 , self.board[0][0].len() as i32 / 2)
+        (self.board[0].len() as i32 / scale as i32 , self.board[0][0].len() as i32 / scale as i32)
     }
 
     pub fn render(&self, term: &Term, center: Vec2) {
@@ -72,5 +72,21 @@ impl Board {
         }
         self.board[layer][position.y as usize][position.x as usize] = char;
         return Ok(position);
+    }
+    
+    pub fn drawline(&mut self, layer: usize, mut frompos: Vec2, mut topos: Vec2, char: char) {
+        //function Adds 1 to longer axis and a ratio to shorter axis
+        if frompos.x > topos.x {let tmp = topos.x; topos.x = frompos.x; frompos.x = tmp;}
+        if frompos.y > topos.y {let tmp = topos.y; topos.y = frompos.y; frompos.y = tmp;}
+        let is_x_longer = (frompos.x-topos.x).abs() > (frompos.y-topos.y).abs();
+        let xdiff: f64 = frompos.x as f64 - topos.x as f64;
+        let ydiff: f64 = frompos.y as f64 - topos.y as f64;
+        let mut y = frompos.y as f64;
+        let mut x = frompos.x as f64;
+        while x != topos.x as f64 || y != topos.y as f64 {
+            self.setchar(layer, Vec2 { x: x.floor() as i32, y: y.floor() as i32 }, char).unwrap();
+            if is_x_longer {y += ydiff / xdiff} else {y += 1.0};
+            if is_x_longer {x+=1.0} else {x += xdiff / ydiff};
+        }
     }
 }
