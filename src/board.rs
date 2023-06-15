@@ -16,6 +16,7 @@ impl Board {
                 //vec![vec!['.'; (size.1 - 1) as usize]; (size.0 - 1) as usize],
                 [['.';400];200], //layer 0 na struktury stale
                 [['.';400];200], //layer 1 na entity
+                [['.';400];200], //layer 2 na entity
             ],
             fov: fov,
         }

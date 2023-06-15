@@ -3,7 +3,13 @@ mod board;
 use board::Board;
 mod player;
 use player::Player;
+use vec2::Vec2;
+mod belt;
 pub mod vec2;
+
+pub trait Destroy {
+    fn destroy(self, board: &mut Board);
+}
 
 fn getfov(maxsize: (u16,u16)) -> (f64, f64) {
     let mut output = (maxsize.0 as f64, maxsize.1 as f64);
@@ -42,6 +48,7 @@ fn main() {
     let fov = getfov(term.size());
     let mut board = Board::new(fov);
     let mut player = Player::new(board.getboardsize(0.5));
+    belt::Belt::new(Vec2{x:200, y:100}, belt::Direction::Up).spawn(&mut board);
     board.setchar(0, vec2::Vec2{x: 10, y: 5}, '#').unwrap();
     term.hide_cursor().unwrap();
     loop {
