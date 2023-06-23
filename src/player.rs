@@ -2,6 +2,7 @@ use console::{Term, Key};
 
 use crate::vec2::Vec2;
 use crate::{Board, Destroy};
+use crate::Move;
 
 pub struct Player {
     skin: char,
@@ -14,15 +15,6 @@ impl Player {
             skin: '@',
             position: Vec2 {x: spawn_location.1, y: spawn_location.0},
             layer: 2,
-        }
-    }
-
-    fn r#move(&mut self, board: &mut Board, position: Vec2) {
-        if let Err(e) = board.setchar(self.layer, self.position + position, self.skin) {
-            println!("{e}");
-        } else {
-            board.setchar(self.layer, self.position, '.').unwrap();
-            self.position += position;
         }
     }
 
@@ -40,5 +32,16 @@ impl Player {
 impl Destroy for Player {
     fn destroy(self, board: &mut Board) {
         todo!()
+    }
+}
+
+impl Move for Player {
+    fn r#move(&mut self, board: &mut Board, position: Vec2) {
+        if let Err(e) = board.setchar(self.layer, self.position + position, self.skin) {
+            println!("{e}");
+        } else {
+            board.setchar(self.layer, self.position, '.').unwrap();
+            self.position += position;
+        }
     }
 }

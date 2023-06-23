@@ -34,6 +34,10 @@ impl Belt {
     pub fn spawn(&self, board: &mut Board) {
         board.setchar(self.layer, self.position, self.skin).unwrap();
     }
+
+    pub fn update(&self, board: &mut Board) -> Vec2 {
+
+    }
 }
 
 impl Destroy for Belt {

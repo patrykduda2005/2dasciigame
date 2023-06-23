@@ -5,7 +5,23 @@ mod player;
 use player::Player;
 use vec2::Vec2;
 mod belt;
+use belt::{Belt,Direction};
 pub mod vec2;
+mod update_cycle;
+use update_cycle::UpdateCycle;
+mod metal;
+use metal::Metal;
+
+pub trait Move {
+    fn r#move(&mut self, board: &mut Board, position: Vec2) {
+        if let Err(e) = board.setchar(self.layer, self.position + position, self.skin) {
+            println!("{e}");
+        } else {
+            board.setchar(self.layer, self.position, '.').unwrap();
+            self.position += position;
+        }
+    }
+}
 
 pub trait Destroy {
     fn destroy(self, board: &mut Board);
@@ -48,7 +64,8 @@ fn main() {
     let fov = getfov(term.size());
     let mut board = Board::new(fov);
     let mut player = Player::new(board.getboardsize(0.5));
-    belt::Belt::new(Vec2{x:200, y:100}, belt::Direction::Up).spawn(&mut board);
+    let mut update_cycle = UpdateCycle::new();
+    update_cycle.add_belt(Belt::new(Vec2{x:200,y:100}, Direction::Up), &mut board);
     board.setchar(0, vec2::Vec2{x: 10, y: 5}, '#').unwrap();
     term.hide_cursor().unwrap();
     loop {
