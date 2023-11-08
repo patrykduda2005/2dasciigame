@@ -22,7 +22,7 @@ struct BoardSize{
     width: usize,
 }
 
-#[derive(Component, Clone, Copy)]
+#[derive(Component, Clone, Copy, PartialEq, PartialOrd)]
 pub struct Coords{
     x: i32,
     y: i32,
@@ -68,9 +68,9 @@ fn init_board (
     mut commands: Commands,
 ) {
     let bs = BoardSize{
-        layers: 1,
-        height: 20,
-        width: 30,
+        layers: 3,
+        height: 200,
+        width: 400,
     };
     commands.spawn((
         Board(
@@ -134,21 +134,43 @@ fn handle_move(
 }
 
 fn render (
-    query: Query<(&Board, &TerminalHandler, &BoardSize)>,
+    board_query: Query<(&Board, &TerminalHandler, &BoardSize)>,
+    player_query: Query<&Coords, With<player::Player>>,
 ) {
-    let (Board(map), TerminalHandler(term), bs) = query.single();
+    let (Board(map), TerminalHandler(term), bs) = board_query.single();
+
+    let term_size = term.size();
+    let center_coords = player_query.single();
+    let padding: usize = 3;
+    
+    //to jest ohydne ale dziala
+    let mut top_edge = center_coords.y + (term_size.0 as i32 / 2) - 2*padding as i32;
+    let mut bottom_edge = center_coords.y - (term_size.0 as i32 / 2);
+    let mut left_edge = center_coords.x - (term_size.1 as i32 / 2);
+    let mut right_edge = center_coords.x + (term_size.1 as i32 / 2) - 2*padding as i32;
+    if top_edge > -1 + bs.height as i32 {top_edge = -1 + bs.height as i32}
+    if bottom_edge < 0 {bottom_edge = 0}
+    if right_edge > -1 + bs.width as i32 {right_edge = -1 + bs.width as i32}
+    if left_edge < 0 {left_edge = 0}
+
+
 
     term.clear_screen().unwrap();
-    for layer in map.iter() {
-        term.move_cursor_to(0, bs.height).unwrap();
-        for y in layer.iter() {
-            for cell in y.iter() {
-                print!("{}", cell);
+    println!("Kordynaty: {}, {}", center_coords.x, center_coords.y);
+    for (layer_number, layer) in map.iter().enumerate() {
+        term.move_cursor_to(0, term_size.0 as usize - padding - 1).unwrap();
+        for y in layer[bottom_edge as usize..=top_edge as usize].iter() {
+            term.move_cursor_right(padding).unwrap();
+            for cell in y[left_edge as usize..=right_edge as usize].iter() {
+                if layer_number > 0 && *cell == '.' {
+                    term.move_cursor_right(1).unwrap();
+                } else {
+                    print!("{}", cell);
+                }
             }
             term.move_cursor_up(1).unwrap();
-            term.move_cursor_left(bs.width).unwrap();
+            term.move_cursor_left(term_size.1 as usize).unwrap();
         }
-        break;
     }
 }
 
@@ -166,6 +188,23 @@ fn spawn <T: Component>(
     }
 }
 
+fn spawn_things(
+    mut spawn_event: EventWriter<AddRemoveEvent>,
+) {
+    spawn_event.send(AddRemoveEvent{
+        action: AddRemove::Add,
+        coords: Coords { x: 20, y: 20 },
+        layer: 0,
+        skin: '#',
+    });
+    spawn_event.send(AddRemoveEvent{
+        action: AddRemove::Add,
+        coords: Coords { x: 200, y: 150 },
+        layer: 0,
+        skin: '#',
+    });
+}
+
 impl Plugin for BoardPlugin {
     fn build(&self, app: &mut App) {
         app
@@ -173,6 +212,7 @@ impl Plugin for BoardPlugin {
             .add_event::<AddRemoveEvent>()
             .add_systems(PreStartup, init_board)
             .add_systems(Startup, prep_term)
+            .add_systems(Startup, spawn_things.after(prep_term))
             .add_plugins(player::PlayerPlugin)
             .add_systems(Update, handle_move)
             .add_systems(Update, handle_addremove)

@@ -11,7 +11,7 @@ fn main() {
         .add_plugins(ScheduleRunnerPlugin{
             run_mode: Loop {
                 wait: Some(
-                    Duration::from_millis(500),
+                    Duration::from_millis(17),
                 ),
             }  
         })
