@@ -386,7 +386,7 @@ dependencies = [
  "bevy_derive",
  "bevy_ecs",
  "bevy_reflect",
- "bevy_tasks",
+ "bevy_tasks 0.11.3",
  "bevy_utils",
  "downcast-rs",
  "wasm-bindgen",
@@ -406,7 +406,7 @@ dependencies = [
  "bevy_ecs",
  "bevy_log",
  "bevy_reflect",
- "bevy_tasks",
+ "bevy_tasks 0.11.3",
  "bevy_utils",
  "bevy_winit",
  "crossbeam-channel",
@@ -452,7 +452,7 @@ dependencies = [
  "bevy_ecs",
  "bevy_math",
  "bevy_reflect",
- "bevy_tasks",
+ "bevy_tasks 0.11.3",
  "bevy_utils",
  "bytemuck",
 ]
@@ -523,7 +523,7 @@ dependencies = [
  "bevy_ecs_macros",
  "bevy_ptr",
  "bevy_reflect",
- "bevy_tasks",
+ "bevy_tasks 0.11.3",
  "bevy_utils",
  "downcast-rs",
  "event-listener",
@@ -667,7 +667,7 @@ dependencies = [
  "bevy_reflect",
  "bevy_render",
  "bevy_scene",
- "bevy_tasks",
+ "bevy_tasks 0.11.3",
  "bevy_transform",
  "bevy_utils",
  "gltf",
@@ -735,7 +735,7 @@ dependencies = [
  "bevy_render",
  "bevy_scene",
  "bevy_sprite",
- "bevy_tasks",
+ "bevy_tasks 0.11.3",
  "bevy_text",
  "bevy_time",
  "bevy_transform",
@@ -891,7 +891,7 @@ dependencies = [
  "bevy_mikktspace",
  "bevy_reflect",
  "bevy_render_macros",
- "bevy_tasks",
+ "bevy_tasks 0.11.3",
  "bevy_time",
  "bevy_transform",
  "bevy_utils",
@@ -985,6 +985,20 @@ name = "bevy_tasks"
 version = "0.11.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c73bbb847c83990d3927005090df52f8ac49332e1643d2ad9aac3cd2974e66bf"
+dependencies = [
+ "async-channel",
+ "async-executor",
+ "async-task",
+ "concurrent-queue",
+ "futures-lite",
+ "wasm-bindgen-futures",
+]
+
+[[package]]
+name = "bevy_tasks"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3a45be906618192515bc613e46546150089adbb4a82178dc462045acd1e89e92"
 dependencies = [
  "async-channel",
  "async-executor",
@@ -1132,7 +1146,7 @@ dependencies = [
  "bevy_hierarchy",
  "bevy_input",
  "bevy_math",
- "bevy_tasks",
+ "bevy_tasks 0.11.3",
  "bevy_utils",
  "bevy_window",
  "crossbeam-channel",
@@ -2485,6 +2499,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "bevy_editor_pls",
+ "bevy_tasks 0.12.0",
  "console",
 ]
 

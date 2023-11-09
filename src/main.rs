@@ -5,6 +5,7 @@ use bevy::app::App;
 use bevy::app::ScheduleRunnerPlugin;
 use bevy::input::InputPlugin;
 mod board;
+mod player;
 
 fn main() {
     App::new()
@@ -17,5 +18,6 @@ fn main() {
         })
         .add_plugins(InputPlugin)
         .add_plugins(board::BoardPlugin)
+        .add_plugins(player::PlayerPlugin)
         .run();
 }

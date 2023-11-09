@@ -2,30 +2,32 @@ use std::ops::Add;
 
 use bevy::prelude::*;
 use console::Term;
-mod player;
 
 pub struct BoardPlugin;
 
 #[derive(Component)]
-struct Skin(char);
+pub struct Skin(pub char);
 
 #[derive(Component)]
-struct Board(Vec<Vec<Vec<char>>>);
+pub struct Layer(pub usize);
 
 #[derive(Component)]
-struct TerminalHandler(Term);
+pub struct Board(Vec<Vec<Vec<char>>>);
 
 #[derive(Component)]
-struct BoardSize{
-    layers: usize,
-    height: usize,
-    width: usize,
+pub struct TerminalHandler(pub Term);
+
+#[derive(Component)]
+pub struct BoardSize{
+    pub layers: usize,
+    pub height: usize,
+    pub width: usize,
 }
 
 #[derive(Component, Clone, Copy, PartialEq, PartialOrd)]
 pub struct Coords{
-    x: i32,
-    y: i32,
+    pub x: i32,
+    pub y: i32,
 }
 impl Add for Coords {
     type Output = Self;
@@ -37,31 +39,23 @@ impl Add for Coords {
     }
 }
 
-#[derive(Component)]
-pub struct Layer(usize);
-
-#[derive(Component)]
-pub struct New;
-
-
 #[derive(Event)]
-struct MoveEvent{
-    layer: usize,
-    from: Coords,
-    to: Coords,
+pub struct MoveEvent{
+    pub layer: usize,
+    pub from: Coords,
+    pub to: Coords,
 }
 
+#[derive(Event)]
+pub struct AddRemoveEvent{
+    pub layer: usize,
+    pub coords: Coords,
+    pub skin: char,
+    pub action: AddRemove,
+}
 pub enum AddRemove {
     Add,
     Remove,
-}
-
-#[derive(Event)]
-struct AddRemoveEvent{
-    layer: usize,
-    coords: Coords,
-    skin: char,
-    action: AddRemove,
 }
 
 fn init_board (
@@ -135,7 +129,7 @@ fn handle_move(
 
 fn render (
     board_query: Query<(&Board, &TerminalHandler, &BoardSize)>,
-    player_query: Query<&Coords, With<player::Player>>,
+    player_query: Query<&Coords, With<super::player::Player>>,
 ) {
     let (Board(map), TerminalHandler(term), bs) = board_query.single();
 
@@ -174,7 +168,7 @@ fn render (
     }
 }
 
-fn spawn <T: Component>(
+pub fn spawn <T: Component>(
     mut query: Query<(&Coords, &Layer, &Skin), With<T>>,
     mut spawn_event: EventWriter<AddRemoveEvent>,
 ) {
@@ -213,7 +207,6 @@ impl Plugin for BoardPlugin {
             .add_systems(PreStartup, init_board)
             .add_systems(Startup, prep_term)
             .add_systems(Startup, spawn_things.after(prep_term))
-            .add_plugins(player::PlayerPlugin)
             .add_systems(Update, handle_move)
             .add_systems(Update, handle_addremove)
             .add_systems(Update, render.after(handle_move).after(handle_addremove));
